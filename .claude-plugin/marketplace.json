@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "juicify",
-      "source": ".",
+      "source": "./plugins/juicify",
       "description": "Turn experience into reusable insight. skill-juice extracts design wisdom from skills; work-juice crystallizes your work into case studies."
     }
   ]
