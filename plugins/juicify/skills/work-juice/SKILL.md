@@ -1,7 +1,7 @@
 ---
 name: work-juice
 description: Use when a task cycle is complete (issue found → analyzed → improved → verified) and you want to capture the thinking process as a reusable case study. Trigger on "case study", "케이스 스터디", "작업 정리", "레슨런", "경험 자산화", "what did I learn".
-disable-model-invocation: true
+disable-model-invocation: false
 argument-hint: "[latest | select]"
 ---
 
