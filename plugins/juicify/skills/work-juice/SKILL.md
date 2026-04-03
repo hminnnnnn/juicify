@@ -17,14 +17,6 @@ argument-hint: "[latest | select]"
 한 세션에 여러 케이스가 존재할 수 있다. 반드시 케이스 단위로 분리하여 리포팅한다.
 여러 케이스를 하나의 리포트에 합치지 않는다.
 
-## 채널(텔레그램 등) 요청 처리
-
-요청이 `<channel>` 태그를 통해 들어온 경우 (텔레그램, Slack 등 외부 채널):
-- 인자가 비어있으면 `latest`로 자동 처리한다 (불필요한 왕복 방지).
-- Step 2의 Y/N 확인을 스킵하고 바로 Step 4로 진행한다.
-- 중간에 사용자 선택이 불가피한 경우(예: Step 3의 케이스 선택), 반드시 채널 reply로 질문을 보내고 채널 응답을 기다린다.
-- 최종 결과물도 반드시 채널 reply로 전송한다.
-
 ## 실행 플로우
 
 ### Step 0: 인자 확인
@@ -32,7 +24,6 @@ argument-hint: "[latest | select]"
 - `$ARGUMENTS`가 "latest"이면 → Step 2로 직행
 - `$ARGUMENTS`가 "select"이면 → Step 3으로 직행
 - `$ARGUMENTS`가 비어있으면 → Step 1로
-- 채널 요청이면서 `$ARGUMENTS`가 비어있으면 → "latest"로 간주, Step 2로 직행
 
 ### Step 1: 모드 선택
 
