@@ -1,7 +1,7 @@
 ---
 name: skill-juice
 description: Use when you want to learn from a skill's design — understand why it works, extract reusable patterns, and apply insights to your own projects. Trigger on "analyze this skill", "learn from this", "what can I learn", "how does this skill work", "juicify", "스킬 분석", "이 스킬에서 배울 점".
-disable-model-invocation: true
+disable-model-invocation: false
 argument-hint: "<skill-path|skill-name|URL> [quick|deep]"
 ---
 
