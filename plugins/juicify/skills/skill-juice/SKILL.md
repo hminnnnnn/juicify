@@ -17,9 +17,42 @@ argument-hint: "<skill-path|skill-name|URL> [quick|deep]"
 
 거인의 어깨에 올라타되, 거인이 어떻게 만들어졌는지를 이해하는 것이 목적이다.
 
+## 저장 경로 설정
+
+**Config 파일**: `.claude/juicify.json` (프로젝트 루트 기준)
+
+```json
+{
+  "work_notes_path": "docs/work-notes",
+  "skill_notes_path": "docs/skill-notes"
+}
+```
+
+경로는 절대 경로 또는 프로젝트 루트 기준 상대 경로 모두 허용.
+
 ## 실행 플로우
 
-### Step 0: 인자 파싱
+### Step 0: 저장 경로 확인
+
+1. `.claude/juicify.json` 파일을 Read로 읽는다.
+2. 파일이 존재하고 `skill_notes_path` 키가 있으면 → 해당 경로 사용, Step 1로 진행.
+3. 파일이 없거나 `skill_notes_path`가 없으면 → 사용자에게 질문:
+
+> **Juicify 저장 경로 설정**
+>
+> 저장 경로가 설정되지 않았습니다.
+> 별도로 지정하지 않으면 현재 프로젝트 폴더에 저장됩니다:
+> - Work Note → `docs/work-notes/`
+> - Skill Note → `docs/skill-notes/`
+>
+> 커스텀 경로를 지정하시겠어요?
+> 1. 기본값 사용
+> 2. 경로 직접 지정
+
+- 1 선택 → 기본값으로 `.claude/juicify.json` 생성 후 진행
+- 2 선택 → Work Note 경로와 Skill Note 경로를 각각 질문 → `.claude/juicify.json` 저장 후 진행
+
+### Step 1: 인자 파싱
 
 `$ARGUMENTS`에서 두 가지를 추출한다:
 - **대상**: 스킬 경로, 스킬 이름, 또는 URL
@@ -33,7 +66,7 @@ argument-hint: "<skill-path|skill-name|URL> [quick|deep]"
 /skill-juice postmortem-writing
 ```
 
-### Step 1: 대상 스킬 접근
+### Step 2: 대상 스킬 접근
 
 대상 유형에 따라 스킬 파일을 읽는다:
 
@@ -57,7 +90,7 @@ argument-hint: "<skill-path|skill-name|URL> [quick|deep]"
 
 후보가 1개뿐이면 확인 없이 진행한다. 스킬을 찾지 못하면 사용자에게 알리고 경로 확인을 요청한다.
 
-### Step 2: 스킬 구조 파악
+### Step 3: 스킬 구조 파악
 
 SKILL.md를 읽고 전체 구조를 파악한다:
 - frontmatter 필드 (name, description, tools, model, context 등)
@@ -67,7 +100,7 @@ SKILL.md를 읽고 전체 구조를 파악한다:
 
 deep 모드에서는 지원 파일도 모두 읽는다.
 
-### Step 3: 6렌즈 분석
+### Step 4: 6렌즈 분석
 
 #### quick 모드 (3개 렌즈)
 
@@ -88,12 +121,12 @@ deep 모드에서는 지원 파일도 모두 읽는다.
 | **사용자 경험** | 사용자와의 상호작용 설계. 입력 유연성, 피드백 루프, 에러 처리 |
 | **적용 가설** | 현재 프로젝트/작업에 적용 가능한 패턴 가설. 각 가설에 검증 포인트 포함. 이미 가진 스킬과의 비교 |
 
-### Step 4: Juice Note 작성 및 저장
+### Step 5: Juice Note 작성 및 저장
 
-juice note를 `docs/skill-notes/YYYY-MM-DD-{스킬이름}.md`에 저장한다.
+juice note를 Step 0에서 확인한 `skill_notes_path`에 `YYYY-MM-DD-{스킬이름}.md`로 저장한다.
 해당 폴더가 없으면 생성한다.
 
-### Step 5: 세션 출력
+### Step 6: 세션 출력
 
 세션에는 핵심 요약만 출력한다:
 - 스킬 한 줄 요약

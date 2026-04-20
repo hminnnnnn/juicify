@@ -17,15 +17,48 @@ argument-hint: "[latest | select]"
 한 세션에 여러 케이스가 존재할 수 있다. 반드시 케이스 단위로 분리하여 리포팅한다.
 여러 케이스를 하나의 리포트에 합치지 않는다.
 
+## 저장 경로 설정
+
+**Config 파일**: `.claude/juicify.json` (프로젝트 루트 기준)
+
+```json
+{
+  "work_notes_path": "docs/work-notes",
+  "skill_notes_path": "docs/skill-notes"
+}
+```
+
+경로는 절대 경로 또는 프로젝트 루트 기준 상대 경로 모두 허용.
+
 ## 실행 플로우
 
-### Step 0: 인자 확인
+### Step 0: 저장 경로 확인
 
-- `$ARGUMENTS`가 "latest"이면 → Step 2로 직행
-- `$ARGUMENTS`가 "select"이면 → Step 3으로 직행
-- `$ARGUMENTS`가 비어있으면 → Step 1로
+1. `.claude/juicify.json` 파일을 Read로 읽는다.
+2. 파일이 존재하고 `work_notes_path` 키가 있으면 → 해당 경로 사용, Step 1로 진행.
+3. 파일이 없거나 `work_notes_path`가 없으면 → 사용자에게 질문:
 
-### Step 1: 모드 선택
+> **Juicify 저장 경로 설정**
+>
+> 저장 경로가 설정되지 않았습니다.
+> 별도로 지정하지 않으면 현재 프로젝트 폴더에 저장됩니다:
+> - Work Note → `docs/work-notes/`
+> - Skill Note → `docs/skill-notes/`
+>
+> 커스텀 경로를 지정하시겠어요?
+> 1. 기본값 사용
+> 2. 경로 직접 지정
+
+- 1 선택 → 기본값으로 `.claude/juicify.json` 생성 후 진행
+- 2 선택 → Work Note 경로와 Skill Note 경로를 각각 질문 → `.claude/juicify.json` 저장 후 진행
+
+### Step 1: 인자 확인
+
+- `$ARGUMENTS`가 "latest"이면 → Step 3로 직행
+- `$ARGUMENTS`가 "select"이면 → Step 4로 직행
+- `$ARGUMENTS`가 비어있으면 → Step 2로
+
+### Step 2: 모드 선택
 
 사용자에게 질문한다:
 
@@ -33,10 +66,10 @@ argument-hint: "[latest | select]"
 > 1. 최근 케이스
 > 2. 케이스 선택
 
-- 1 선택 → Step 2
-- 2 선택 → Step 3
+- 1 선택 → Step 3
+- 2 선택 → Step 4
 
-### Step 2: 최근 케이스 확인 (단일)
+### Step 3: 최근 케이스 확인 (단일)
 
 세션에서 가장 최근에 완료된 케이스를 식별하고 한 줄 요약을 제시한다:
 
@@ -45,10 +78,10 @@ argument-hint: "[latest | select]"
 >
 > 이 케이스를 리포팅할까요? (Y/N)
 
-- Y → Step 4 (리포팅 진행)
+- Y → Step 5 (리포팅 진행)
 - N → 그 이전 케이스를 제시하고 다시 확인. 반복.
 
-### Step 3: 케이스 선택 (복수)
+### Step 4: 케이스 선택 (복수)
 
 세션 전체를 분석하여 독립된 케이스를 추출하고 번호를 매겨 나열한다:
 
@@ -60,14 +93,14 @@ argument-hint: "[latest | select]"
 >
 > 리포팅할 케이스 번호를 선택하세요 (복수 가능, 예: 1,3)
 
-선택된 케이스 각각에 대해 Step 4를 반복한다. 각 케이스는 별도 MD 파일로 생성.
+선택된 케이스 각각에 대해 Step 5를 반복한다. 각 케이스는 별도 MD 파일로 생성.
 
-### Step 4: 리포팅 진행
+### Step 5: 리포팅 진행
 
 선택된 케이스에 대해:
 1. 해당 케이스의 세션 맥락만 추출 (다른 케이스 내용 혼입 금지)
 2. 리포트 구조에 맞춰 작성
-3. `docs/work-notes/YYYY-MM-DD-{주제-요약}.md`로 저장
+3. Step 0에서 확인한 `work_notes_path`에 `YYYY-MM-DD-{주제-요약}.md`로 저장
 4. 저장 경로와 요약을 사용자에게 알려줌
 
 ## 리포트 구조
